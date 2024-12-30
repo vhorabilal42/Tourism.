@@ -1,0 +1,170 @@
+const Tour = require('../models/toursModels')
+
+const createTour = async (req, res)=>{
+    try {
+        const newTour = await Tour.create(req.body)
+        res.status(201).json({
+            message: 'Tour is create',
+            status: 'success',
+            data:{
+                Tour : newTour
+            }
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: 'fail',
+            message: error
+        })
+    }   
+}
+
+const getAllTours = async (req, res)=>{
+    try {
+        // BUILD THE QUERY
+        // console.log(req.query);  //--> { duration: '10', rating: '4' }
+
+// 1) FILTERING
+        const queryObject = {...req.query}
+        const excludedField = ['page', 'limit', 'sort', 'field'];
+
+        excludedField.forEach(el=> delete queryObject[el])
+        // console.log(req.query, queryObject);
+
+// 2) ADVANCE FILTERING.(price greate than OR less than this type of filter is used.)
+/*  http://localhost:3010/api/v1/tours?price[lt]=499  */
+
+        let queryStr = JSON.stringify(queryObject)
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match =>`$${match}`)
+        console.log(JSON.parse(queryStr));  /* { price: { '$gte': '2997' } } */  /* Less than greater than filter is Apply (learn more about Regular Expression)*/
+        /* Between Price Filter apply and search by name also  */
+
+        let query = Tour.find(JSON.parse(queryStr))  /* find() give Data in an Array. */
+
+// 3) SORTING
+/*  http://localhost:3010/api/v1/tours?sort=price,ratingAverage */
+
+        // req.query.sort --> price
+        /*if(req.query.sort){
+            query = query.sort(req.query.sort) 
+        }*/
+
+        // More than one filter
+        if(req.query.sort){
+            const sortBy = req.query.sort.split(',').join(' ')   /*  sort=price,ratingAverage we split this query by , and join by space */
+            // console.log(sortBy);   /* price ratingAverage */
+            query = query.sort(sortBy)
+        }
+        else{
+            query = query.sort('-createAt')
+        }
+
+// 4) FIELDS LIMIT  (Not work)
+/*  http://localhost:3010/api/v1/tours?fields=name,duration,price */
+
+        if(req.query.fields){
+            const fieldQuery = req.query.fields.split(',').join(' ')
+            console.log(fieldQuery);
+            query = query.select(fieldQuery);
+        }
+        else{
+            query = query.select('-__v')   // this part is work
+        }
+
+// 5) PAGINATION
+/*  http://localhost:3010/api/v1/tours?page=3&limit=3  */
+
+        const page = req.query.page * 1 || 1;
+        const limit = req.query.limit * 1 || 100;
+        const skip = (page - 1) * limit;
+
+        query = query.skip(skip).limit(limit)
+
+        if(req.query.page){
+            const numTours = await Tour.countDocuments();
+            if(skip >= numTours) throw new Error('This page does not exists.')
+        }
+
+// EXECUTED THE QUERY. 
+
+        const feature = new APIFeatures(Tour.find(), req.query)
+        const tour = await query
+        
+// SEND RESPONSE.
+
+        res.status(200).json({
+            status: 'success',
+            results: tour.length, 
+            data:{
+                tour
+            }
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: 'fail',
+            message: `${error}`
+        })
+    }
+}
+
+const getTour = async (req,res)=>{
+    const id = req.params.id
+    try {
+        const tour = await Tour.findById(id);
+        // Tour.findOne({ _id: req.params.id })
+        res.status(200).json({
+            status: 'success',
+            data: {
+                tour
+            }
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: 'fail',
+            message: error
+        })
+    }
+}
+
+const updateTour = async (req, res)=>{
+    try {
+        const tour = await Tour.findByIdAndUpdate(req.params.id, req.body,{
+            new: true,  // show the update record
+            runValidators: true // the validator put in mondoDB is also apply during update.
+        })
+        res.status(200).json({
+            status: 'success',
+            data:{
+                tour
+            }
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: 'fail',
+            message: error
+        })
+    }
+}
+
+const deleteTour = async (req, res)=>{
+    try {
+        // await Tour.findByIdAndDelete(req.params.id)  // This is Good Practise
+        const tour = await Tour.findByIdAndDelete(req.params.id)  // Only for demo
+        console.log(tour);
+
+        res.status(204).json({
+            status: 'success'
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: 'fail',
+            message: error
+        })
+    }
+}
+module.exports = {
+    createTour,
+    getAllTours,
+    getTour,
+    updateTour,
+    deleteTour
+}
