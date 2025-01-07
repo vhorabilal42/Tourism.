@@ -1,3 +1,4 @@
+const { populate } = require("dotenv");
 const Tour = require("../models/toursModels");
 
 const createTour = async (req, res) => {
@@ -92,8 +93,14 @@ const getAllTours = async (req, res) => {
 const getTour = async (req, res) => {
     const id = req.params.id;
     try {
-        const tour = await Tour.findById(id);
-        // Tour.findOne({ _id: req.params.id })
+        const tour = await Tour.findById(id).populate({
+            path: 'reviews',
+            // populate: {
+            //     path: 'user',
+            //     select: 'name email'
+            // }
+        });
+        // Tour.findOne({ _id: req.params.id })   /* populate is used to fill the data using reference. */
         res.status(200).json({
             status: "success",
             data: {

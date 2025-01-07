@@ -6,6 +6,7 @@ const xssClean = require('xss-clean')
 
 const tourRoutes = require('./routes/tourRoutes')
 const userRoutes = require('./routes/userRoutes')
+const reviews = require('./routes/reviewRoutes')
 const app = express();
 
 // GLOBAL Middleware
@@ -46,6 +47,7 @@ app.use(xssClean())
 
 app.use('/api/v1/tours', tourRoutes);
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/reviews', reviews);
 
 /* 
 app.all('*', (req, res, next)=>{
