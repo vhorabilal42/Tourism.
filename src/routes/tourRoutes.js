@@ -2,7 +2,12 @@ const express = require('express');
 const tourController = require('../controller/tourController')
 const middlewareTour = require('../middleware/top5tours')
 const authController = require('../controller/authController')
+// const reviewcont = require('../controller/reviewController')
+const reviewrouts = require('../routes/reviewRoutes');
 const tourRouter = express.Router()
+
+/* Nested Routes */
+tourRouter.use('/:tourId/reviews', reviewrouts)
 
 tourRouter.get('/top-5-cheap', middlewareTour.aliseTopTours,tourController.getAllTours)
 
@@ -20,7 +25,17 @@ tourRouter
     .route('/:id')
     .get(tourController.getTour)
     .patch(tourController.updateTour)
-    .delete(authController.protect, authController.restrictTo('admin', 'lead-guide') ,tourController.deleteTour)
+    .delete(authController.protect, 
+        authController.restrictTo('admin', 'lead-guide'), 
+        tourController.deleteTour)
 
+/*  add reviews according to the tours. */
+
+// tourRouter.route('/:tourId/reviews')
+// .post(
+//     authController.protect,
+//     authController.restrictTo('user'),
+//     reviewcont.addReview
+// )
 
 module.exports = tourRouter

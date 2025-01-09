@@ -2,20 +2,21 @@ const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const fs = require('fs');
 const Tour = require('../models/toursModels');
-const { log } = require('console');
 dotenv.config({path: '../.env'})
 
 // console.log(process.env.DATABASE_URL);// if other file is not in same root file
 //  you must give the path.
 
-mongoose.connect(process.env.DATABASE_URL,{
+console.log("Import File is Run");
+
+mongoose.connect('mongodb://localhost:27017/tours',{
 })
     .then(()=>console.log('DB-Connection Succesfully ...'))
     .catch((err)=>console.log(err))
 
 
 // Read JSON File
-const tour = JSON.parse(fs.readFileSync(`tours-simple.json`, 'utf-8'));
+const tour = JSON.parse(fs.readFileSync(`tours.json`, 'utf-8'));
 // console.log(tour)
 
 //  Import Data into Database.
@@ -25,7 +26,7 @@ const importData = async()=>{
         await Tour.create(tour)
         console.log('Tour Create Succesfully ...');
     } catch (error) {
-        console.log("Error in Tour Create");
+        console.log("Error in Tour Create"+ error);
     }
     process.exit()
 }
