@@ -137,8 +137,8 @@ const updateTour = async (req, res) => {
 
 const deleteTour = async (req, res) => {
     try {
-        // await Tour.findByIdAndDelete(req.params.id)  // This is Good Practise
-        const tour = await Tour.findByIdAndDelete(req.params.id); // Only for demo
+        // await Tour.findByIdAndDelete(req.params.id)                  // This is good practise
+        const tour = await Tour.findByIdAndDelete(req.params.id);       // Only for demo
         console.log(tour);
 
         res.status(204).json({
