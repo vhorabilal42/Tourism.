@@ -1,23 +1,8 @@
 const { populate } = require("dotenv");
 const Tour = require("../models/toursModels");
+const factory = require('./handlerFactory')
 
-const createTour = async (req, res) => {
-    try {
-        const newTour = await Tour.create(req.body);
-        res.status(201).json({
-            message: "Tour is create",
-            status: "success",
-            data: {
-                Tour: newTour,
-            },
-        });
-    } catch (error) {
-        res.status(400).json({
-            status: "fail",
-            message: error,
-        });
-    }
-};
+const createTour = factory.createOne(Tour)
 
 class APIFeatures {
     constructor(query, queryString) {
@@ -115,42 +100,49 @@ const getTour = async (req, res) => {
     }
 };
 
-const updateTour = async (req, res) => {
-    try {
-        const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-            new: true, // show the update record
-            runValidators: true, // the validator put in mondoDB is also apply during update.
-        });
-        res.status(200).json({
-            status: "success",
-            data: {
-                tour,
-            },
-        });
-    } catch (error) {
-        res.status(400).json({
-            status: "fail",
-            message: error,
-        });
-    }
-};
+// const updateTour = async (req, res) => {
+//     try {
+//         const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//             new: true, // show the update record
+//             runValidators: true, // the validator put in mondoDB is also apply during update.
+//         });
+//         res.status(200).json({
+//             status: "success",
+//             data: {
+//                 tour,
+//             },
+//         });
+//     } catch (error) {
+//         res.status(400).json({
+//             status: "fail",
+//             message: error,
+//         });
+//     }
+// };
 
-const deleteTour = async (req, res) => {
-    try {
-        // await Tour.findByIdAndDelete(req.params.id)                  // This is good practise
-        const tour = await Tour.findByIdAndDelete(req.params.id);       // Only for demo
-        console.log(tour);
+/* Handler Factory Functions. */
+const updateTour = factory.updateOne(Tour)
 
-        res.status(204).json({
-            status: "success",
-        });
-    } catch (error) {
-        res.status(400).json({
-            status: "fail",
-            message: error,
-        });
-    }
-};
+
+// const deleteTour = async (req, res) => {
+//     try {
+//         // await Tour.findByIdAndDelete(req.params.id)                  // This is good practise
+//         const tour = await Tour.findByIdAndDelete(req.params.id);       // Only for demo
+//         console.log(tour);
+
+//         res.status(204).json({
+//             status: "success",
+//         });
+//     } catch (error) {
+//         res.status(400).json({
+//             status: "fail",
+//             message: error,
+//         });
+//     }
+// };
+
+/* Handler Factory Functions. */
+const deleteTour = factory.deleteOne(Tour)
 
 const getTourStats = async (req, res)=>{
     try {

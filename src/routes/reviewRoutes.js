@@ -7,7 +7,7 @@ const reviewRoutes = express.Router({ mergeParams: true})
 /* add reviews. */
 // reviewRoutes.post('/addreview', authcontroller.protect, authcontroller.restrictTo('user'), reviewController.addReview)
 
-/* get your reviews. */
+/* get reviews for a specific persion. */
 reviewRoutes.get('/yourreviews', authcontroller.protect, reviewController.yourReviews)
 
 reviewRoutes.route('/')
@@ -16,5 +16,21 @@ reviewRoutes.route('/')
     authcontroller.restrictTo('user'),
     reviewController.addReview
 )
+
+/* Get only tour revews. */
+reviewRoutes.get('/',authcontroller.protect,
+    reviewController.tourReviews
+)
+
+
+/* Delete Reviews. */
+reviewRoutes.delete('/:id', authcontroller.protect, 
+    authcontroller.restrictTo('user'), 
+    reviewController.deleteReviews);
+
+/* Update Reviews. */
+reviewRoutes.patch('/:id', authcontroller.protect, 
+    authcontroller.restrictTo('user'), 
+    reviewController.updateReview)
 
 module.exports = reviewRoutes

@@ -1,4 +1,5 @@
 const User = require("../models/userModels");
+const factory = require('./handlerFactory')
 
 exports.getAllUsers = async (req, res) => {
   try {

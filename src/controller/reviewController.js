@@ -1,5 +1,5 @@
 const reviewModel = require('../models/reviewModels')
-
+const factory = require('./handlerFactory')
 
 const addReview = async (req, res) => {
     const {review, rating} = req.body;
@@ -58,8 +58,34 @@ const yourReviews = async (req, res) => {
     }
 };
 
+const tourReviews = async (req, res)=>{
+    let filter = {}
+    if (req.params.tourId){
+        filter = {tour: req.params.tourId}
+    }
+
+    try {
+        const tourReviews = await reviewModel.find(filter)
+
+        return res.status(201).json({
+            tourReviews
+        })
+        
+    } catch (error) {
+       return res.status(400).json({
+        status: 'fail',
+        message: error.message || 'Bad Request.'
+       }) 
+    }
+}
+
+const deleteReviews = factory.deleteOne(reviewModel);
+const updateReview = factory.updateOne(reviewModel)
 
 module.exports = {
     addReview,
-    yourReviews
+    yourReviews,
+    tourReviews,
+    deleteReviews,
+    updateReview
 }
